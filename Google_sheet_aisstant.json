@@ -1,0 +1,256 @@
+{
+  "name": "Google sheet aisstant",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "authentication": "basicAuth",
+        "initialMessages": "Hi there! 👋\nMy name is Musab. How can I assist you today?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4ea6cbf3-5d0c-407a-a918-e919f7c75840",
+      "name": "When chat message received",
+      "webhookId": "36ed1556-a83f-455b-b7b6-a6c665254280"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        220,
+        0
+      ],
+      "id": "77a78dc0-bcac-4087-ba94-295179bce30f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-04-17",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        220,
+        220
+      ],
+      "id": "d418d26a-d31d-4d68-90c8-35470bd8b01e",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        240
+      ],
+      "id": "a249ba18-14e3-48c7-a29a-e879e078faa9",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1QeMW_Lsp-1Is5R8vIXWRaRKz_DiN0VMWjGeQb6iGEE0",
+          "mode": "list",
+          "cachedResultName": "Fruit_Prices",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QeMW_Lsp-1Is5R8vIXWRaRKz_DiN0VMWjGeQb6iGEE0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1383023131,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QeMW_Lsp-1Is5R8vIXWRaRKz_DiN0VMWjGeQb6iGEE0/edit#gid=1383023131"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        440,
+        160
+      ],
+      "id": "a15e6fc5-a4f4-4518-98ee-5bfd218932a5",
+      "name": "Google Sheets"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1QeMW_Lsp-1Is5R8vIXWRaRKz_DiN0VMWjGeQb6iGEE0",
+          "mode": "list",
+          "cachedResultName": "Fruit_Prices",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QeMW_Lsp-1Is5R8vIXWRaRKz_DiN0VMWjGeQb6iGEE0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1383023131,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QeMW_Lsp-1Is5R8vIXWRaRKz_DiN0VMWjGeQb6iGEE0/edit#gid=1383023131"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fruit Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Fruit_Name__using_to_match_', ``, 'string') }}",
+            "Price (per kg)": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Price__per_kg_', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Fruit Name"
+          ],
+          "schema": [
+            {
+              "id": "Fruit Name",
+              "displayName": "Fruit Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Price (per kg)",
+              "displayName": "Price (per kg)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        580,
+        160
+      ],
+      "id": "9f40ec46-4faf-4d85-8a8e-67bcaf9f65e2",
+      "name": "Inventory mange"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "1QeMW_Lsp-1Is5R8vIXWRaRKz_DiN0VMWjGeQb6iGEE0",
+          "mode": "list",
+          "cachedResultName": "Fruit_Prices",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QeMW_Lsp-1Is5R8vIXWRaRKz_DiN0VMWjGeQb6iGEE0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1383023131,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QeMW_Lsp-1Is5R8vIXWRaRKz_DiN0VMWjGeQb6iGEE0/edit#gid=1383023131"
+        },
+        "startIndex": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start_Row_Number', ``, 'number') }}",
+        "numberToDelete": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Number_of_Rows_to_Delete', ``, 'number') }}"
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        740,
+        180
+      ],
+      "id": "2d66e2b2-4991-4ae4-8c08-57e73fcc2a71",
+      "name": "Delete rows and colums"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inventory mange": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete rows and colums": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1cf873e3-c6b1-41cf-a973-c73618e83d45",
+  "meta": {
+    "instanceId": "ab25ba907ec9fa43787046c159b4eb21d4a6a913f12044328d00034fe200bb3b"
+  },
+  "id": "XM1W55xWPVCTvjG2",
+  "tags": []
+}

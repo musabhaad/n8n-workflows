@@ -1,0 +1,612 @@
+{
+  "name": "Product image generator",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -860,
+        640
+      ],
+      "id": "f8260eb2-7019-45ed-badc-ab223bfe6b34",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1uX5A5RBvC9X9Fj0DJAjK9fTA385zhZj84pgukQbDTDI",
+          "mode": "list",
+          "cachedResultName": "Product details"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "pending"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -640,
+        640
+      ],
+      "id": "de20b4d3-1496-469b-97f6-c103246dd03e",
+      "name": "Get Pending Product",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "owLPGiyC45LPb2jc",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here's my product details:\n\nPost Type: {{ $json['Post type'] }}\nBrand Name: {{ $json['Brandname'] }}\nProduct Name: {{ $json['Product name'] }}\nBrand Tone: {{ $json['Brand tone'] }}\nColor Theme: {{ $json['Colour theme'] }}\nBackground Style: {{ $json['Background style'] }}\nLighting Style: {{ $json['Lighting style'] }}\nProduct Placement: {{ $json['Product placement'] }}\nTypography Style: {{ $json['Typography style'] }}\nComposition Guidelines: {{ $json['Composition guidelines'] }}\nContent Text: {{ $json['Content'] }}\nSize: {{ $json['Size'] }}\n\nCreate a detailed AI image generation prompt for this product.",
+        "options": {
+          "systemMessage": "You are a professional product photographer and AI prompt engineer specializing in luxury product photography.\n\nYour task is to transform the provided product details into a comprehensive AI image generation prompt that will create stunning, professional product images.\n\nGuidelines:\n1. Create a detailed, specific prompt that incorporates all provided details\n2. Focus on visual elements: lighting, composition, materials, colors\n3. Include technical photography terms for better AI understanding\n4. Emphasize luxury and premium quality\n5. Make the prompt specific to the post type (Product Introduction, Giveaway, Limited-Time Offer, etc.)\n6. Include relevant mood and atmosphere keywords\n7. Specify camera angles and technical details\n8. Keep the prompt under 500 words but highly descriptive\n\nOutput Format:\nProvide only the final AI image generation prompt, ready to be used directly with image generation APIs. Do not include explanations or additional text.\n\nPost-Type Specific Elements:\n- Product Introduction: Clean, minimal, focus on product features\n- Giveaway: Celebratory, exciting, with celebration elements\n- Limited-Time Offer: Urgent, exclusive, with time-sensitive visual cues\n- Testimonial: Authentic, trust-building, lifestyle context\n- Behind-the-Scenes: Candid, process-focused, authentic\n- Q&A Story: Interactive, engaging, question-focused layout"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -500,
+        640
+      ],
+      "id": "6e627af8-20e9-43af-ac94-ee4a682d2326",
+      "name": "Generate AI Prompt"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-exp",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -500,
+        880
+      ],
+      "id": "7f17dd29-f990-4f00-bb24-45bac04e93f5",
+      "name": "Google Gemini Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "lbm3aj8la0YC4p9a",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.piapi.ai/api/v1/task",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: 'Qubico/flux1-dev',\n  task_type: 'txt2img',\n  input: {\n    prompt: $('Generate AI Prompt').item.json.output,\n    width: $('Get Pending Product').item.json.Size === 'Square' ? 1024 : ($('Get Pending Product').item.json.Size === 'Portrait' ? 768 : 1024),\n    height: $('Get Pending Product').item.json.Size === 'Square' ? 1024 : ($('Get Pending Product').item.json.Size === 'Portrait' ? 1024 : 768),\n    num_inference_steps: 28,\n    guidance_scale: 3.5,\n    seed: -1\n  }\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -200,
+        640
+      ],
+      "id": "f1f812a0-65ee-48ad-b310-12ef831ba107",
+      "name": "Start Image Generation",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Am6jwWNDsseF6K0B",
+          "name": "PIapi"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        20,
+        640
+      ],
+      "id": "a88efa40-5231-4c38-849e-86e8eb35b5b1",
+      "name": "Wait 5 Seconds",
+      "webhookId": "cbcc889f-6341-4816-95ac-d7617ac3fcd7"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.piapi.ai/api/v1/task/{{ $('Start Image Generation').item.json.data.task_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        640
+      ],
+      "id": "615c8f34-122a-4565-971f-fe79f3248eda",
+      "name": "Check Generation Status",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Am6jwWNDsseF6K0B",
+          "name": "PIapi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        460,
+        640
+      ],
+      "id": "e9eed4d3-1112-4c3c-ae83-cdcabecc7a99",
+      "name": "Is Generation Complete?"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        460,
+        840
+      ],
+      "id": "0b58a85c-93d9-476d-8c57-1ccf65a999db",
+      "name": "Wait Before Retry",
+      "webhookId": "10b22f0d-22b4-4579-b39e-13083789b815"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data.output.image_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        640
+      ],
+      "id": "793c2d4a-86c5-408b-b5fc-045c7f979bf2",
+      "name": "Download Generated Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Am6jwWNDsseF6K0B",
+          "name": "PIapi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Get Pending Product').item.json['Product name' ] }} ",
+        "driveId": {
+          "__rl": true,
+          "value": "https://img.theapi.app/temp/cd57e8d2-abf6-48cc-b59a-15b8a9abec20.png",
+          "mode": "url"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "10Jrl5yiIORLCuEhEz2nOsEQLmmRWIpw7",
+          "mode": "list",
+          "cachedResultName": "Product image",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/10Jrl5yiIORLCuEhEz2nOsEQLmmRWIpw7"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        900,
+        640
+      ],
+      "id": "ed6a2021-d655-4387-8f9d-ae0e260a80a4",
+      "name": "Upload to Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ztKPqrt3y31I7WeP",
+          "name": "Google Drive account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1uX5A5RBvC9X9Fj0DJAjK9fTA385zhZj84pgukQbDTDI",
+          "mode": "list",
+          "cachedResultName": "Product details"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "Success",
+            "row_number": "={{ $('Get Pending Product').item.json.row_number }}",
+            "Result": "={{ $('Download Generated Image').item.json.data.output.image_url }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Post type",
+              "displayName": "Post type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Size",
+              "displayName": "Size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Product image",
+              "displayName": "Product image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Brandname",
+              "displayName": "Brandname",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Product name",
+              "displayName": "Product name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Brand tone",
+              "displayName": "Brand tone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Colour theme",
+              "displayName": "Colour theme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Background style",
+              "displayName": "Background style",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Product placement",
+              "displayName": "Product placement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Lighting style",
+              "displayName": "Lighting style",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Typography style",
+              "displayName": "Typography style",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Composition guidelines",
+              "displayName": "Composition guidelines",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Result",
+              "displayName": "Result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1120,
+        640
+      ],
+      "id": "c89727e8-49c1-48c3-ad5c-e7673ca46194",
+      "name": "Update Sheet Status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "owLPGiyC45LPb2jc",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Pending Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Pending Product": {
+      "main": [
+        [
+          {
+            "node": "Generate AI Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate AI Prompt": {
+      "main": [
+        [
+          {
+            "node": "Start Image Generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate AI Prompt",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Image Generation": {
+      "main": [
+        [
+          {
+            "node": "Wait 5 Seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5 Seconds": {
+      "main": [
+        [
+          {
+            "node": "Check Generation Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Generation Status": {
+      "main": [
+        [
+          {
+            "node": "Is Generation Complete?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Generation Complete?": {
+      "main": [
+        [
+          {
+            "node": "Download Generated Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait Before Retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Before Retry": {
+      "main": [
+        [
+          {
+            "node": "Check Generation Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Generated Image": {
+      "main": [
+        [
+          {
+            "node": "Upload to Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Update Sheet Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "bd4c6367-739a-4be6-a26c-27dc8b81b083",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ab25ba907ec9fa43787046c159b4eb21d4a6a913f12044328d00034fe200bb3b"
+  },
+  "id": "T7nUwYUsh0VjKx9Y",
+  "tags": []
+}

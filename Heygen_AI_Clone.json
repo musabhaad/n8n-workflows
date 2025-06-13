@@ -1,0 +1,474 @@
+{
+  "name": "Heygen AI Clone",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        860,
+        940
+      ],
+      "id": "ebe7b231-bac9-4c2c-8694-2064b22ae31d",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.heygen.com/v2/video/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"avatar_id\",\n        \"avatar_style\": \"normal\"\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": \"Hey AI Automation Society Family. You guys rock.\",\n        \"voice_id\": \"voice_id\",\n        \"speed\": 1.1\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 1280,\n    \"height\": 720\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        620
+      ],
+      "id": "efe1d758-8192-43e1-a345-aff95076c023",
+      "name": "Generate Video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Am6jwWNDsseF6K0B",
+          "name": "PIapi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.heygen.com/v2/voices",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        360
+      ],
+      "id": "ddd75e09-f4cf-4ec8-8152-beb6050b516e",
+      "name": "Get Voices",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Am6jwWNDsseF6K0B",
+          "name": "PIapi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.heygen.com/v2/avatars",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        100
+      ],
+      "id": "5d687aa1-7413-4ed6-b7e3-f08e64731103",
+      "name": "Get Avatars",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Am6jwWNDsseF6K0B",
+          "name": "PIapi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Get Avatar ID\n",
+        "height": 280,
+        "width": 400,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        580,
+        -20
+      ],
+      "id": "e98a2e38-7221-43d0-8fda-e062cf7e0222",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Get Voice ID\n",
+        "height": 260,
+        "width": 400,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        550,
+        260
+      ],
+      "id": "0298b034-dd42-46d4-bf4b-f3abef1f4cbf",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "url": "https://api.heygen.com/v1/video_status.get",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "video_id",
+              "value": "={{ $json.data.video_id }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        920,
+        620
+      ],
+      "id": "2fa785b4-79ef-4290-b8e9-8ede25bcc501",
+      "name": "Get Video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Am6jwWNDsseF6K0B",
+          "name": "PIapi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Create Video\n",
+        "height": 300,
+        "width": 400,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        550,
+        480
+      ],
+      "id": "3b338fbd-05f5-4e4e-9997-fe56ea4c38c3",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "url": "https://api.heygen.com/v1/video_status.get",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "video_id",
+              "value": "={{ $('Generate Video1').item.json.data.video_id }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1360,
+        1180
+      ],
+      "id": "61552111-ce27-4bc6-90e6-aa3b53eb52f6",
+      "name": "Get Video1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DBOwoso6L5gsKWra",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dd44e8b9-64ae-4a91-8d19-966910447f71",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1580,
+        1180
+      ],
+      "id": "9ee75282-71eb-4ed5-befb-80ea7523288c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "# Create Video w/ Polling\n",
+        "height": 560,
+        "width": 960,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        820,
+        820
+      ],
+      "id": "69fef8ee-7dd4-4131-b4ba-58fbcd4302c0",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Get Video\n",
+        "height": 300,
+        "width": 400,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        770,
+        480
+      ],
+      "id": "af4c102f-707b-4d7b-b206-46a794bf1417",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.heygen.com/v2/video/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"3f986506a35f480d898f4137286bd78c\",\n        \"avatar_style\": \"normal\"\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": \"Assalam-o-Alaikum! My name is Musab Haad. I am a student with a strong passion for technology and creativity. I create AI agents using n8n, work as a digital marketer, edit videos, and also build Shopify stores. In addition, I'm a web developer who enjoys turning ideas into reality. I love working on new concepts, creating engaging content, and inspiring others through my work. On this channel, you'll find emotional and motivational stories that will touch your heart. Every story carries a life lesson to help you grow. If you enjoy my videos, don't forget to like, share, and subscribe. Thank you!\",\n        \"voice_id\": \"1b04dce5d4fb4b5aa30ddb2859e43f91\",\n        \"speed\": 1.1\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 1280,\n    \"height\": 720\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        920,
+        1180
+      ],
+      "id": "d59cb8ac-b1df-4be1-8ac2-9df7675e853e",
+      "name": "Generate Video1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "DBOwoso6L5gsKWra",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 60
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1140,
+        1180
+      ],
+      "id": "d6e55648-c5fe-41b5-819b-299018c810c1",
+      "name": "60 Seconds",
+      "webhookId": "c6346cbc-9d67-4868-80a4-bfc927f0830a",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1580,
+        1040
+      ],
+      "id": "b422542b-a7e6-4674-bcd9-edee5aeaa35e",
+      "name": "10 sec",
+      "webhookId": "9f7623f7-6605-4455-a927-09b536ee9e99"
+    }
+  ],
+  "pinData": {
+    "Generate Video1": [
+      {
+        "json": {
+          "error": null,
+          "data": {
+            "video_id": "b3171f9bd54a43e6af790cea3e4e1892"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Generate Video1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Video": {
+      "main": [
+        [
+          {
+            "node": "Get Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Video1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "10 sec",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Video1": {
+      "main": [
+        [
+          {
+            "node": "60 Seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "60 Seconds": {
+      "main": [
+        [
+          {
+            "node": "Get Video1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "10 sec": {
+      "main": [
+        [
+          {
+            "node": "Get Video1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "155cb06f-fda9-418f-8146-6004a4fdd99b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ab25ba907ec9fa43787046c159b4eb21d4a6a913f12044328d00034fe200bb3b"
+  },
+  "id": "fLQSVZ4M04J1jEGf",
+  "tags": []
+}

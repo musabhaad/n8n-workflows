@@ -1,0 +1,273 @@
+{
+  "name": "Email responder",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -660,
+        160
+      ],
+      "id": "7e773391-5e83-427e-9973-dc23d858fa14",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q6MvN3eC0VneRTS0",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Sponsership",
+              "description": "Introduction: The sender introduces themselves and provides information about their company or product.  Sponsorship Proposal: This part presents the offer for sponsorship, such as involvement in an event, campaign, or project.  Benefits: The sender outlines the benefits of the sponsorship, such as branding opportunities, exposure, or access to a specific audience.  Call to Action: The email often includes a request for a specific action, like scheduling a meeting, discussing the proposal, or signing an agreement.  Closing: The email concludes in a polite and professional tone, with the sender providing contact details for further communication."
+            },
+            {
+              "category": "Greetings",
+              "description": "Introduction: The sender introduces themselves and often mentions the purpose of the email.  Warm Greeting: The email opens with a friendly and polite greeting, such as \"I hope you're doing well\" or \"I hope this message finds you in good health.\"  Personalized Message: The sender may include a personal message or reference something specific to the recipient, like an event or recent achievement.  Friendly Tone: The overall tone of the email remains casual and approachable.  Closing: The email ends with a warm closing, such as \"Best regards,\" \"Take care,\" or \"Looking forward to hearing from you.\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        160
+      ],
+      "id": "0b5741ac-7a44-45c6-aebd-07f01b4e2abf",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -440,
+        340
+      ],
+      "id": "0906a595-ffae-4280-a893-41f0cbf4e1d0",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "eZdE6IWAA8sBb6Xl",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an assistent of youtube channel: islamicinformation300.\n\nYour job is to respond the email below:\n\nFirst,Acknowledge the Request: Begin by thanking the sender for reaching out and expressing interest in a sponsorship opportunity.\n\nProvide Sponsorship Details: Inform them that the base sponsorship cost is $500. You can mention that this includes [mention any key benefits, such as exposure, branding opportunities, etc.].\n\nOffer Additional Information: Let the sender know that you are happy to provide more detailed information if needed, such as specific benefits or package customization.\n\nEncourage Follow-up: Invite them to schedule a call or meeting if they’d like to discuss further details or move forward.\n\nProfessional Closing: End the response on a polite note, expressing enthusiasm about the potential partnership and providing your contact details.\n\nI want you to respond in two parts:\n1)Email subject\n2)Email body\n\nThe email to respond is: {{ $json.text }}\n\nMake sure to write the email professionally. And don't send \"This email was sent automatically with n8n\" at the end.",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        0,
+        0
+      ],
+      "id": "64067975-7cfc-4cde-9f37-a8f15757e89a",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "eZdE6IWAA8sBb6Xl",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an AI assistent , your job is to respond the greeting emails as good as you can.\n\nI want you to respond in two parts:\n1)Email subject\n2)Email body\n\nThe email is:{{ $json.text }}\nMake sure to write the email professionally. And don't send \"This email was sent automatically with n8n\" at the end.",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -20,
+        240
+      ],
+      "id": "41f956a6-b2b5-4f50-9bff-3aaf44aa1998",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "eZdE6IWAA8sBb6Xl",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.message.content.subject }}",
+        "message": "={{ $json.message.content.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        340,
+        240
+      ],
+      "id": "7add3044-b66e-4305-a826-0d35cfadac98",
+      "name": "greeting email (draft)",
+      "webhookId": "d53db1e0-ab31-4008-ba93-cb848ccc85fd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q6MvN3eC0VneRTS0",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.message.content.email_subject }}",
+        "message": "={{ $json.message.content.email_body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        360,
+        0
+      ],
+      "id": "7ba649f0-b7f6-47ef-bb04-4254c00195d1",
+      "name": "sponsership email (draft)",
+      "webhookId": "ecae9c86-fe47-4419-b3c3-e43d5fdafcf6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q6MvN3eC0VneRTS0",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "sponsership email (draft)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "greeting email (draft)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "44cb48cd-da6f-41dc-ae01-d472d893a74e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ab25ba907ec9fa43787046c159b4eb21d4a6a913f12044328d00034fe200bb3b"
+  },
+  "id": "khUieuxaxMPgUidC",
+  "tags": []
+}

@@ -1,0 +1,1713 @@
+{
+  "name": "Yt shorts machine",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        940
+      ],
+      "id": "9bb868b0-b0c7-40bb-aa5d-02eaab382b22",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1QAkhtfS-EMtlDiMeeQBDr6IcZhBtW9x7A_qCyilMujU",
+          "mode": "list",
+          "cachedResultName": "Faceless Shorts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QAkhtfS-EMtlDiMeeQBDr6IcZhBtW9x7A_qCyilMujU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QAkhtfS-EMtlDiMeeQBDr6IcZhBtW9x7A_qCyilMujU/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "videoStatus",
+              "lookupValue": "Todo"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        320,
+        900
+      ],
+      "id": "2e5ead0f-3755-4afb-8025-fb6938688c99",
+      "name": "Grab Idea",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "owLPGiyC45LPb2jc",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aefd1ab6-29fc-46a8-b817-cf86d62d5e4d",
+              "name": "animals",
+              "value": "=[\"{{ $json['animal 1'] }}\",\"{{ $json['animal 2'] }}\",\"{{ $json['animal 3'] }}\",\"{{ $json['animal 4'] }}\"]",
+              "type": "array"
+            },
+            {
+              "id": "16c0db54-c132-4719-87e6-9253a3fc6a54",
+              "name": "style",
+              "value": "={{ $json.style }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        540,
+        900
+      ],
+      "id": "b71416da-eebe-4864-b401-bb02cee16e08",
+      "name": "Set Animals"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "animals",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        760,
+        900
+      ],
+      "id": "7a918b4b-66cb-4c2f-848e-f7e2bc089b86",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Animal: {{ $json.animals }}\nStyle: {{ $('Set Animals').item.json.style }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are a master image prompt generator specialized in crafting detailed, high-quality prompts for advanced image models like Flux. Your task is to generate vivid, well-structured prompts that accurately depict an animal dressed in a specified style, with a matching background that complements the theme.\n\n## Instructions:\n- Clearly describe the animal's appearance, including fur, feathers, or scales.\n- Specify the outfit and accessories that reflect the given style, ensuring they fit naturally.\n- Include details about the background that reinforce the style, creating a cohesive scene.\n- Use rich, descriptive language to enhance visual fidelity.\n- Avoid generic terms—opt for precise, imaginative descriptions that maximize prompt effectiveness.\n- Never output quotation marks (\"\") or newlines (\\n)\n\n## Example \n- Input:\nAnimal: Fox\nStyle: Cyberpunk\n\n- Output:\nA sleek red fox with vibrant fur and piercing blue cybernetic eyes, wearing a futuristic black leather jacket with neon blue accents and glowing circuitry patterns. A high-tech visor covers one eye, displaying holographic data. The fox stands confidently on a rain-slicked city street illuminated by neon signs in Japanese and English. Hovering drones and bustling pedestrians in cybernetic attire add depth to the scene, while distant flying cars streak through the dark, misty skyline.\n\n\n## IMPORTANT\n- All prompts must be family friendly, no sensitive words should be used.\n- No references to weapons (even toy guns).\n- No reference of “showdowns\" or violent events.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        980,
+        900
+      ],
+      "id": "71a1346f-35a5-46e8-a776-9f8332aa88e9",
+      "name": "Image Prompt Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "// N8N Code Node to remove all newline characters from previous node outputs\n\n// Process all items in the array\n// This will work regardless of whether we're running once for all items or once per item\nfor (let i = 0; i < items.length; i++) {\n  const currentItem = items[i];\n  \n  // Check if the item has an output property\n  if (currentItem.json && currentItem.json.output !== undefined) {\n    // Replace all newline characters with empty string\n    // Using a global regex to catch ALL instances of \\n\n    currentItem.json.output = currentItem.json.output.replace(/\\\\n/g, '');\n    \n    // Also replace actual newline characters if they exist\n    currentItem.json.output = currentItem.json.output.replace(/\\n/g, '');\n  }\n}\n\n// Return the processed items array\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        900
+      ],
+      "id": "9d19b492-763c-47cd-90b1-d090be3be056",
+      "name": "Remove \\n"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3f7846c8-2c7f-440f-8245-71bf158ea311",
+              "name": "prompts",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        900
+      ],
+      "id": "250562f3-14b9-4013-9140-48b5a0e1dc98",
+      "name": "Set Prompts"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.piapi.ai/api/v1/task",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"Qubico/flux1-dev\",\n    \"task_type\": \"txt2img\",\n    \"input\": {\n        \"prompt\": \"{{ $json.prompts }}\",\n        \"width\": 540, \n        \"height\": 960\n    } \n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        1320
+      ],
+      "id": "b6874ee5-ea02-4dcd-8137-d4c288c666ff",
+      "name": "Generate Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Am6jwWNDsseF6K0B",
+          "name": "PIapi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 90
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        260,
+        1320
+      ],
+      "id": "dacb4656-5fe2-409b-b5d0-bfc3af67af7a",
+      "name": "90 seconds",
+      "webhookId": "ffdc5132-c0fe-44f6-af2b-4b3bb8894153"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.piapi.ai/api/v1/task/{{ $json.data.task_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        1320
+      ],
+      "id": "0c99dabb-a339-4952-a152-4091ef0607c3",
+      "name": "Get Images",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Am6jwWNDsseF6K0B",
+          "name": "PIapi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.creatomate.com/v1/renders",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer add628e827e0493a8a8950b1294306040f6bc15be846515f7b5e4e418c1f61b1003b1fb7605d0733f6ce7a1add313f8b"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"template_id\": \"2efdd69b-0cbf-4301-8ce8-81ec06373c1b\",\n  \"modifications\": {\n    \"Video-1.source\": \"{{ $json.videos[0].videoUrl }}\",\n    \"Video-2.source\": \"{{ $json.videos[1].videoUrl }}\",\n    \"Video-3.source\": \"{{ $json.videos[2].videoUrl }}\",\n    \"Video-4.source\": \"{{ $json.videos[3].videoUrl }}\",\n    \"Audio-Track.source\": \"https://creatomate.com/files/assets/642db848-211e-4102-9970-63c1455538f2\",\n    \"Text-1.text\": \"{{ $('Grab Idea').first().json['animal 1'] }}\",\n    \"Text-2.text\": \"{{ $('Grab Idea').first().json['animal 2'] }}\",\n    \"Text-3.text\": \"{{ $('Grab Idea').first().json['animal 3'] }}\",\n    \"Text-4.text\": \"{{ $('Grab Idea').first().json['animal 4'] }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1740,
+        1320
+      ],
+      "id": "95ca56c2-97b2-4499-9fdf-76628e16fa56",
+      "name": "Render Video"
+    },
+    {
+      "parameters": {
+        "amount": 25
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1960,
+        1320
+      ],
+      "id": "a1fed811-f75f-4843-836f-91878e2ef931",
+      "name": "25 Seconds",
+      "webhookId": "d5cd29e8-d3f7-491c-a6b6-2d705aa47931"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1400,
+        1580
+      ],
+      "id": "39ff90ec-bb51-4b22-8fc8-1b7d7746cde8",
+      "name": "Download Video"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $('Grab Idea').first().json.title }}",
+        "regionCode": "PK",
+        "categoryId": "1",
+        "options": {
+          "description": "={{ $('Grab Idea').first().json.caption }}",
+          "privacyStatus": "public"
+        }
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        1580
+      ],
+      "id": "2587282e-9240-4bda-8c63-3d11eb40c170",
+      "name": "Upload Video",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "ikrxizNtGhY2XPsP",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1QAkhtfS-EMtlDiMeeQBDr6IcZhBtW9x7A_qCyilMujU",
+          "mode": "list",
+          "cachedResultName": "Faceless Shorts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QAkhtfS-EMtlDiMeeQBDr6IcZhBtW9x7A_qCyilMujU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1K-Btbc1KvhIK-ShsRhFpcPpxR604vHwNACz0Ohwf7Gk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Grab Idea').first().json.row_number }}",
+            "publishStatus": "Processed",
+            "videoLink": "={{ $('Download Video').item.json.url }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "animal 1",
+              "displayName": "animal 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "animal 2",
+              "displayName": "animal 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "animal 3",
+              "displayName": "animal 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "animal 4",
+              "displayName": "animal 4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "style",
+              "displayName": "style",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "caption",
+              "displayName": "caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "videoStatus",
+              "displayName": "videoStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "publishStatus",
+              "displayName": "publishStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "videoLink",
+              "displayName": "videoLink",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1720,
+        1580
+      ],
+      "id": "12e8b285-93b2-427a-b8a2-837246ccfec9",
+      "name": "Update Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "owLPGiyC45LPb2jc",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "monuijaj786@gmail.com",
+        "subject": "=New Short Processed: {{ $('Grab Idea').first().json.title }}",
+        "emailType": "text",
+        "message": "=[Name],\n\nA new short has been created and is awaiting your approval.\n\nIt is called \"{{ $('Grab Idea').first().json.title }}\".\n\nYou can view it here: \n\nCheers!",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1920,
+        1580
+      ],
+      "id": "fc16c91e-31a5-4cac-96a4-81a5b507d5e6",
+      "name": "Notification",
+      "webhookId": "495213a9-3d81-40bf-a612-1240bf7498db",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q6MvN3eC0VneRTS0",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        140,
+        760
+      ],
+      "id": "40172e43-38c0-4710-a9d2-8f5727e767f8",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "# Generate Image Prompts",
+        "height": 460,
+        "width": 1840,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -20,
+        720
+      ],
+      "typeVersion": 1,
+      "id": "8fab7424-ecf5-4a84-96ae-02d42ea4a096",
+      "name": "Sticky Note3",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "# Generate Images\n",
+        "height": 260,
+        "width": 600,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -40,
+        1220
+      ],
+      "typeVersion": 1,
+      "id": "56fa3d67-ba10-49e4-93be-68fa89f1f07e",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# Render & Upload\n",
+        "height": 580,
+        "width": 880
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1340,
+        1220
+      ],
+      "typeVersion": 1,
+      "id": "c837d02b-5627-4f8b-990d-c2e39b57624b",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# Generate Videos\n",
+        "height": 360,
+        "width": 660,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        620,
+        1300
+      ],
+      "typeVersion": 1,
+      "id": "0c8f6d2b-8b4d-4062-aff7-34416b83a39b",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# Musab Haad | AI Automation",
+        "height": 80,
+        "width": 500,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        600
+      ],
+      "typeVersion": 1,
+      "id": "268660a7-4610-4a60-b879-884819a1a468",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.piapi.ai/api/v1/task/{{ $json.data.task_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        380,
+        1540
+      ],
+      "id": "bf46c969-6df3-4a96-b927-41cf6261973a",
+      "name": "Get Videos (Kling)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Am6jwWNDsseF6K0B",
+          "name": "PIapi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.piapi.ai/api/v1/task",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"model\": \"kling\",\n    \"mode\": \"std\",\n    \"task_type\": \"video_generation\",\n    \"input\": {\n        \"prompt\": \"{{ $json.data.input.prompt }}\",\n        \"negative_prompt\": \"bad quality\",\n        \"cfg_scale\": 0.5,\n        \"duration\": 5,\n        \"image_url\": \"{{ $json.data.output.image_url }}\",\n        \"aspect_ratio\": \"9:16\",\n        \"camera_control\": {\n            \"type\": \"simple\",\n            \"config\": {\n                \"horizontal\": 0,\n                \"vertical\": 0,\n                \"pan\": 0,\n                \"tilt\": 0,\n                \"roll\": 0,\n                \"zoom\": 0\n            }\n        },\n        \"mode\": \"std\"\n    },\n    \"config\": {}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        20,
+        1540
+      ],
+      "id": "e4e678f1-1b18-4d2b-9c5e-262d4afe6665",
+      "name": "Generate Videos (Kling)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Am6jwWNDsseF6K0B",
+          "name": "PIapi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 8,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        200,
+        1540
+      ],
+      "id": "b9a3cf91-88ed-4846-897c-c173386ceff3",
+      "name": "8 Minutes1",
+      "webhookId": "501d3896-713d-4546-bc42-7e9e7943d92f"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fixed code to extract video URLs from Fal.ai response structure\n// This handles the actual structure returned by the Fal.ai API\n\n// Function to extract video info from the actual Fal.ai response structure\nfunction extractVideoInfo(obj, index) {\n  // Handle the actual Fal.ai structure: { video: { url: \"...\", ... } }\n  if (obj && obj.video && obj.video.url) {\n    return {\n      index: index,\n      videoUrl: obj.video.url,\n      contentType: obj.video.content_type || 'video/mp4',\n      fileName: obj.video.file_name || 'output.mp4',\n      fileSize: obj.video.file_size || 0\n    };\n  }\n  \n  // Fallback: Handle the old expected structure (if API changes back)\n  if (obj && obj.code === 200 && \n      obj.data && obj.data.output && obj.data.output.video_url) {\n    return {\n      index: index,\n      taskId: obj.data.task_id,\n      videoUrl: obj.data.output.video_url,\n      prompt: obj.data.input.prompt\n    };\n  }\n  \n  // Handle direct URL structure\n  if (obj && typeof obj === 'string' && obj.startsWith('http')) {\n    return {\n      index: index,\n      videoUrl: obj\n    };\n  }\n  \n  return null;\n}\n\n// Initialize results array\nconst videoUrls = [];\nlet currentIndex = 1;\n\n// n8n specific: loop through all items\nfor (const item of items) {\n  console.log(`Processing item ${currentIndex}:`, JSON.stringify(item.json, null, 2));\n  \n  // Case 1: item.json is our array of video objects\n  if (Array.isArray(item.json)) {\n    item.json.forEach(entry => {\n      const videoInfo = extractVideoInfo(entry, currentIndex);\n      if (videoInfo) {\n        videoUrls.push(videoInfo);\n        currentIndex++;\n      }\n    });\n  } \n  // Case 2: item.json is a single video object\n  else if (typeof item.json === 'object') {\n    const videoInfo = extractVideoInfo(item.json, currentIndex);\n    if (videoInfo) {\n      videoUrls.push(videoInfo);\n      currentIndex++;\n    }\n  }\n}\n\nconsole.log(`Extracted ${videoUrls.length} video URLs:`, videoUrls);\n\n// Return the extracted URLs as the output\nreturn [{\n  json: {\n    totalVideos: videoUrls.length,\n    videos: videoUrls\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1400,
+        1320
+      ],
+      "id": "e4192c6c-0744-4533-8659-697a2c3817d9",
+      "name": "Split Out Parts (Kling)1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        980,
+        1120
+      ],
+      "id": "33159bee-a037-4cdf-9e97-7ec0bb335c01",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "eZdE6IWAA8sBb6Xl",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://fal.run/fal-ai/kling-video/v1.6/standard/image-to-video",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"image_url\": \"{{ $json.image_url || $json.data.output.image_url }}\",\n    \"prompt\": \"{{ $json.prompt || $json.data.input.prompt || 'Beautiful cinematic video' }}\",\n    \"negative_prompt\": \"bad quality, blurry, low resolution\",\n    \"duration\": \"5\",\n    \"aspect_ratio\": \"9:16\",\n    \"cfg_scale\": 0.5,\n    \"mode\": \"std\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        920,
+        1440
+      ],
+      "id": "be3792a2-85b5-425a-8f0c-fe228ef2d41f",
+      "name": "Generate Videos (Fal.ai)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "THIVihb9ZSoBkNxL",
+          "name": "fal ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "For Piapi.ai\n",
+        "height": 200,
+        "width": 600
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        1500
+      ],
+      "id": "4d14944c-124d-40a8-94f3-4e92bb52f56c",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {
+    "Image Prompt Agent": [
+      {
+        "json": {
+          "output": "A magnificent Indominus Rex, its scales a shimmering blend of iridescent greens and deep purples, adorned with futuristic, bioluminescent patterns that pulse softly. It boasts sleek, elongated limbs and a long, elegant tail, perfectly suited for swift movement across extraterrestrial landscapes. Draped over its massive frame is a lightweight, metallic exosuit that features glowing circuits and panels, enhancing its ferocity while showcasing a vibrant cosmic theme. A stylish helmet, equipped with an advanced visor displaying interstellar data, completes its look. \n\nThe background depicts an otherworldly planet, with towering crystal formations and swirling nebulae painted across a star-filled sky. Brightly colored alien flora sprouts from the ground, and in the distance, a dazzling space station orbits a vibrant gas giant. The entire scene vibrates with an electric energy, reinforcing the adventurous spirit of this intergalactic dino crew."
+        }
+      },
+      {
+        "json": {
+          "output": "A magnificent Spinosaurus with shimmering emerald green scales and a crest of vibrant, iridescent sail feathers stands proudly, outfitted in a sleek metallic space suit adorned with luminous patterns inspired by distant galaxies. Its eyes shimmer with the colors of nebulae, evoking a sense of adventure and bold exploration. The dinosaur's suit features advanced technological enhancements, including a holographic control panel on its left wrist displaying star maps and mission data. The background showcases a surreal alien landscape with swirling purple and blue skies dotted with sparkling stars and massive planets hanging low, while futuristic spacecraft hover nearby, ready for the next expedition. Floating crystal-like rocks and bioluminescent flora dot the terrain, casting an ethereal glow that enhances the intergalactic atmosphere of this thrilling scene."
+        }
+      },
+      {
+        "json": {
+          "output": "A sleek and agile velociraptor with shimmering emerald scales and striking golden eyes, adorned in a vibrant spacesuit that features a kaleidoscope of cosmic patterns, complete with a sleek helmet designed for interstellar travel. The suit boasts silver accents and glowing circuitry that pulse with energy. Equipped with futuristic gauntlets that enhance agility and a utility belt filled with advanced gadgets, the velociraptor stands poised on the deck of a starship, surrounded by a panoramic view of distant galaxies and swirling nebulae. Twinkling stars and colorful cosmic dust fill the backdrop, while intergalactic crew members in matching outfits bustle around, working on various alien technologies, creating a lively and adventurous atmosphere in this otherworldly scene."
+        }
+      },
+      {
+        "json": {
+          "output": "A majestic triceratops with shimmering scales that reflect a spectrum of colors, its large frills adorned with bioluminescent patterns that pulsate in rhythm with its surroundings. Dressed in a sleek metallic exosuit colored in deep space blue and silver, the triceratops showcases a series of glowing tech gadgets along its back and sides, including a holographic communicator that projects star maps. A futuristic helmet, intricately designed with star motifs, fits snugly atop its head, complete with visor that displays vital space statistics. The background reveals a vibrant alien planet dotted with luminescent flora and peculiar rock formations under a swirling nebula sky filled with distant stars and planets. Hovering spacecrafts zip through the atmosphere, and a kaleidoscope of colorful, alien creatures can be seen wandering the terrain, adding a sense of adventure to this intergalactic scene."
+        }
+      }
+    ],
+    "Get Images": [
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "task_id": "efc866c7-7b7f-4d37-987f-cb69a3e7498c",
+            "model": "Qubico/flux1-dev",
+            "task_type": "txt2img",
+            "status": "completed",
+            "config": {
+              "service_mode": "",
+              "webhook_config": {
+                "endpoint": "",
+                "secret": ""
+              }
+            },
+            "input": {
+              "batch_size": 0,
+              "custom_settings": null,
+              "denoise": 0,
+              "guidance_scale": 0,
+              "height": 960,
+              "image": "",
+              "lora_settings": null,
+              "negative_prompt": "",
+              "prompt": "A magnificent Indominus Rex, its scales a shimmering blend of iridescent greens and deep purples, adorned with futuristic, bioluminescent patterns that pulse softly. It boasts sleek, elongated limbs and a long, elegant tail, perfectly suited for swift movement across extraterrestrial landscapes. Draped over its massive frame is a lightweight, metallic exosuit that features glowing circuits and panels, enhancing its ferocity while showcasing a vibrant cosmic theme. A stylish helmet, equipped with an advanced visor displaying interstellar data, completes its look. The background depicts an otherworldly planet, with towering crystal formations and swirling nebulae painted across a star-filled sky. Brightly colored alien flora sprouts from the ground, and in the distance, a dazzling space station orbits a vibrant gas giant. The entire scene vibrates with an electric energy, reinforcing the adventurous spirit of this intergalactic dino crew.",
+              "return_preprocessed_image": false,
+              "scale": 0,
+              "seed": 0,
+              "steps": 0,
+              "width": 540
+            },
+            "output": {
+              "image_base64": "",
+              "image_url": "https://img.theapi.app/temp/aaf6b650-831c-4f04-96d1-3750e967b5de.png"
+            },
+            "meta": {
+              "created_at": "2025-06-06T04:57:54.938196258Z",
+              "started_at": "2025-06-06T04:57:55.393686405Z",
+              "ended_at": "2025-06-06T04:58:28.659773735Z",
+              "usage": {
+                "type": "llm",
+                "frozen": 0,
+                "consume": 150000
+              },
+              "is_using_private_pool": false
+            },
+            "detail": null,
+            "logs": [],
+            "error": {
+              "code": 0,
+              "raw_message": "",
+              "message": "",
+              "detail": null
+            }
+          },
+          "message": "success"
+        }
+      },
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "task_id": "0fac296e-b376-4ae2-ba64-e519b0aea273",
+            "model": "Qubico/flux1-dev",
+            "task_type": "txt2img",
+            "status": "completed",
+            "config": {
+              "service_mode": "",
+              "webhook_config": {
+                "endpoint": "",
+                "secret": ""
+              }
+            },
+            "input": {
+              "batch_size": 0,
+              "custom_settings": null,
+              "denoise": 0,
+              "guidance_scale": 0,
+              "height": 960,
+              "image": "",
+              "lora_settings": null,
+              "negative_prompt": "",
+              "prompt": "A magnificent Spinosaurus with shimmering emerald green scales and a crest of vibrant, iridescent sail feathers stands proudly, outfitted in a sleek metallic space suit adorned with luminous patterns inspired by distant galaxies. Its eyes shimmer with the colors of nebulae, evoking a sense of adventure and bold exploration. The dinosaur's suit features advanced technological enhancements, including a holographic control panel on its left wrist displaying star maps and mission data. The background showcases a surreal alien landscape with swirling purple and blue skies dotted with sparkling stars and massive planets hanging low, while futuristic spacecraft hover nearby, ready for the next expedition. Floating crystal-like rocks and bioluminescent flora dot the terrain, casting an ethereal glow that enhances the intergalactic atmosphere of this thrilling scene.",
+              "return_preprocessed_image": false,
+              "scale": 0,
+              "seed": 0,
+              "steps": 0,
+              "width": 540
+            },
+            "output": {
+              "image_base64": "",
+              "image_url": "https://img.theapi.app/temp/d3541def-7740-4f7c-b011-4d69129234cf.png"
+            },
+            "meta": {
+              "created_at": "2025-06-06T04:57:54.937411617Z",
+              "started_at": "2025-06-06T04:57:55.393467141Z",
+              "ended_at": "2025-06-06T04:58:28.715168808Z",
+              "usage": {
+                "type": "llm",
+                "frozen": 0,
+                "consume": 150000
+              },
+              "is_using_private_pool": false
+            },
+            "detail": null,
+            "logs": [],
+            "error": {
+              "code": 0,
+              "raw_message": "",
+              "message": "",
+              "detail": null
+            }
+          },
+          "message": "success"
+        }
+      },
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "task_id": "4ca9e02c-2017-4392-8bec-b38fd90a0d2a",
+            "model": "Qubico/flux1-dev",
+            "task_type": "txt2img",
+            "status": "completed",
+            "config": {
+              "service_mode": "",
+              "webhook_config": {
+                "endpoint": "",
+                "secret": ""
+              }
+            },
+            "input": {
+              "batch_size": 0,
+              "custom_settings": null,
+              "denoise": 0,
+              "guidance_scale": 0,
+              "height": 960,
+              "image": "",
+              "lora_settings": null,
+              "negative_prompt": "",
+              "prompt": "A sleek and agile velociraptor with shimmering emerald scales and striking golden eyes, adorned in a vibrant spacesuit that features a kaleidoscope of cosmic patterns, complete with a sleek helmet designed for interstellar travel. The suit boasts silver accents and glowing circuitry that pulse with energy. Equipped with futuristic gauntlets that enhance agility and a utility belt filled with advanced gadgets, the velociraptor stands poised on the deck of a starship, surrounded by a panoramic view of distant galaxies and swirling nebulae. Twinkling stars and colorful cosmic dust fill the backdrop, while intergalactic crew members in matching outfits bustle around, working on various alien technologies, creating a lively and adventurous atmosphere in this otherworldly scene.",
+              "return_preprocessed_image": false,
+              "scale": 0,
+              "seed": 0,
+              "steps": 0,
+              "width": 540
+            },
+            "output": {
+              "image_base64": "",
+              "image_url": "https://img.theapi.app/temp/a85cb82f-19e8-4cf9-83ed-aa322351fd63.png"
+            },
+            "meta": {
+              "created_at": "2025-06-06T04:57:54.93981764Z",
+              "started_at": "2025-06-06T04:57:55.393863911Z",
+              "ended_at": "2025-06-06T04:58:29.388145955Z",
+              "usage": {
+                "type": "llm",
+                "frozen": 0,
+                "consume": 150000
+              },
+              "is_using_private_pool": false
+            },
+            "detail": null,
+            "logs": [],
+            "error": {
+              "code": 0,
+              "raw_message": "",
+              "message": "",
+              "detail": null
+            }
+          },
+          "message": "success"
+        }
+      },
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "task_id": "93a98ecf-c5df-4808-ba7d-39ea932d71e2",
+            "model": "Qubico/flux1-dev",
+            "task_type": "txt2img",
+            "status": "completed",
+            "config": {
+              "service_mode": "",
+              "webhook_config": {
+                "endpoint": "",
+                "secret": ""
+              }
+            },
+            "input": {
+              "batch_size": 0,
+              "custom_settings": null,
+              "denoise": 0,
+              "guidance_scale": 0,
+              "height": 960,
+              "image": "",
+              "lora_settings": null,
+              "negative_prompt": "",
+              "prompt": "A majestic triceratops with shimmering scales that reflect a spectrum of colors, its large frills adorned with bioluminescent patterns that pulsate in rhythm with its surroundings. Dressed in a sleek metallic exosuit colored in deep space blue and silver, the triceratops showcases a series of glowing tech gadgets along its back and sides, including a holographic communicator that projects star maps. A futuristic helmet, intricately designed with star motifs, fits snugly atop its head, complete with visor that displays vital space statistics. The background reveals a vibrant alien planet dotted with luminescent flora and peculiar rock formations under a swirling nebula sky filled with distant stars and planets. Hovering spacecrafts zip through the atmosphere, and a kaleidoscope of colorful, alien creatures can be seen wandering the terrain, adding a sense of adventure to this intergalactic scene.",
+              "return_preprocessed_image": false,
+              "scale": 0,
+              "seed": 0,
+              "steps": 0,
+              "width": 540
+            },
+            "output": {
+              "image_base64": "",
+              "image_url": "https://img.theapi.app/temp/f3a1c2d7-8e61-45be-a70b-1dc4005c6392.png"
+            },
+            "meta": {
+              "created_at": "2025-06-06T04:57:54.923993086Z",
+              "started_at": "2025-06-06T04:57:55.393392322Z",
+              "ended_at": "2025-06-06T04:58:45.595618263Z",
+              "usage": {
+                "type": "llm",
+                "frozen": 0,
+                "consume": 150000
+              },
+              "is_using_private_pool": false
+            },
+            "detail": null,
+            "logs": [],
+            "error": {
+              "code": 0,
+              "raw_message": "",
+              "message": "",
+              "detail": null
+            }
+          },
+          "message": "success"
+        }
+      }
+    ],
+    "Generate Image": [
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "task_id": "efc866c7-7b7f-4d37-987f-cb69a3e7498c",
+            "model": "Qubico/flux1-dev",
+            "task_type": "txt2img",
+            "status": "pending",
+            "config": {
+              "service_mode": "",
+              "webhook_config": {
+                "endpoint": "",
+                "secret": ""
+              }
+            },
+            "input": {
+              "prompt": "A magnificent Indominus Rex, its scales a shimmering blend of iridescent greens and deep purples, adorned with futuristic, bioluminescent patterns that pulse softly. It boasts sleek, elongated limbs and a long, elegant tail, perfectly suited for swift movement across extraterrestrial landscapes. Draped over its massive frame is a lightweight, metallic exosuit that features glowing circuits and panels, enhancing its ferocity while showcasing a vibrant cosmic theme. A stylish helmet, equipped with an advanced visor displaying interstellar data, completes its look. The background depicts an otherworldly planet, with towering crystal formations and swirling nebulae painted across a star-filled sky. Brightly colored alien flora sprouts from the ground, and in the distance, a dazzling space station orbits a vibrant gas giant. The entire scene vibrates with an electric energy, reinforcing the adventurous spirit of this intergalactic dino crew.",
+              "negative_prompt": "",
+              "image": "",
+              "width": 540,
+              "height": 960,
+              "guidance_scale": 0,
+              "denoise": 0,
+              "seed": 0,
+              "steps": 0,
+              "batch_size": 0,
+              "scale": 0,
+              "return_preprocessed_image": false,
+              "lora_settings": null,
+              "custom_settings": null
+            },
+            "output": null,
+            "meta": {
+              "created_at": "2025-06-06T04:57:54.938196258Z",
+              "started_at": "0001-01-01T00:00:00Z",
+              "ended_at": "0001-01-01T00:00:00Z",
+              "usage": {
+                "type": "llm",
+                "frozen": 0,
+                "consume": 150000
+              },
+              "is_using_private_pool": false
+            },
+            "detail": null,
+            "logs": [],
+            "error": {
+              "code": 0,
+              "raw_message": "",
+              "message": "",
+              "detail": null
+            }
+          },
+          "message": "success"
+        }
+      },
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "task_id": "0fac296e-b376-4ae2-ba64-e519b0aea273",
+            "model": "Qubico/flux1-dev",
+            "task_type": "txt2img",
+            "status": "pending",
+            "config": {
+              "service_mode": "",
+              "webhook_config": {
+                "endpoint": "",
+                "secret": ""
+              }
+            },
+            "input": {
+              "prompt": "A magnificent Spinosaurus with shimmering emerald green scales and a crest of vibrant, iridescent sail feathers stands proudly, outfitted in a sleek metallic space suit adorned with luminous patterns inspired by distant galaxies. Its eyes shimmer with the colors of nebulae, evoking a sense of adventure and bold exploration. The dinosaur's suit features advanced technological enhancements, including a holographic control panel on its left wrist displaying star maps and mission data. The background showcases a surreal alien landscape with swirling purple and blue skies dotted with sparkling stars and massive planets hanging low, while futuristic spacecraft hover nearby, ready for the next expedition. Floating crystal-like rocks and bioluminescent flora dot the terrain, casting an ethereal glow that enhances the intergalactic atmosphere of this thrilling scene.",
+              "negative_prompt": "",
+              "image": "",
+              "width": 540,
+              "height": 960,
+              "guidance_scale": 0,
+              "denoise": 0,
+              "seed": 0,
+              "steps": 0,
+              "batch_size": 0,
+              "scale": 0,
+              "return_preprocessed_image": false,
+              "lora_settings": null,
+              "custom_settings": null
+            },
+            "output": null,
+            "meta": {
+              "created_at": "2025-06-06T04:57:54.937411617Z",
+              "started_at": "0001-01-01T00:00:00Z",
+              "ended_at": "0001-01-01T00:00:00Z",
+              "usage": {
+                "type": "llm",
+                "frozen": 0,
+                "consume": 150000
+              },
+              "is_using_private_pool": false
+            },
+            "detail": null,
+            "logs": [],
+            "error": {
+              "code": 0,
+              "raw_message": "",
+              "message": "",
+              "detail": null
+            }
+          },
+          "message": "success"
+        }
+      },
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "task_id": "4ca9e02c-2017-4392-8bec-b38fd90a0d2a",
+            "model": "Qubico/flux1-dev",
+            "task_type": "txt2img",
+            "status": "pending",
+            "config": {
+              "service_mode": "",
+              "webhook_config": {
+                "endpoint": "",
+                "secret": ""
+              }
+            },
+            "input": {
+              "prompt": "A sleek and agile velociraptor with shimmering emerald scales and striking golden eyes, adorned in a vibrant spacesuit that features a kaleidoscope of cosmic patterns, complete with a sleek helmet designed for interstellar travel. The suit boasts silver accents and glowing circuitry that pulse with energy. Equipped with futuristic gauntlets that enhance agility and a utility belt filled with advanced gadgets, the velociraptor stands poised on the deck of a starship, surrounded by a panoramic view of distant galaxies and swirling nebulae. Twinkling stars and colorful cosmic dust fill the backdrop, while intergalactic crew members in matching outfits bustle around, working on various alien technologies, creating a lively and adventurous atmosphere in this otherworldly scene.",
+              "negative_prompt": "",
+              "image": "",
+              "width": 540,
+              "height": 960,
+              "guidance_scale": 0,
+              "denoise": 0,
+              "seed": 0,
+              "steps": 0,
+              "batch_size": 0,
+              "scale": 0,
+              "return_preprocessed_image": false,
+              "lora_settings": null,
+              "custom_settings": null
+            },
+            "output": null,
+            "meta": {
+              "created_at": "2025-06-06T04:57:54.93981764Z",
+              "started_at": "0001-01-01T00:00:00Z",
+              "ended_at": "0001-01-01T00:00:00Z",
+              "usage": {
+                "type": "llm",
+                "frozen": 0,
+                "consume": 150000
+              },
+              "is_using_private_pool": false
+            },
+            "detail": null,
+            "logs": [],
+            "error": {
+              "code": 0,
+              "raw_message": "",
+              "message": "",
+              "detail": null
+            }
+          },
+          "message": "success"
+        }
+      },
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "task_id": "93a98ecf-c5df-4808-ba7d-39ea932d71e2",
+            "model": "Qubico/flux1-dev",
+            "task_type": "txt2img",
+            "status": "pending",
+            "config": {
+              "service_mode": "",
+              "webhook_config": {
+                "endpoint": "",
+                "secret": ""
+              }
+            },
+            "input": {
+              "prompt": "A majestic triceratops with shimmering scales that reflect a spectrum of colors, its large frills adorned with bioluminescent patterns that pulsate in rhythm with its surroundings. Dressed in a sleek metallic exosuit colored in deep space blue and silver, the triceratops showcases a series of glowing tech gadgets along its back and sides, including a holographic communicator that projects star maps. A futuristic helmet, intricately designed with star motifs, fits snugly atop its head, complete with visor that displays vital space statistics. The background reveals a vibrant alien planet dotted with luminescent flora and peculiar rock formations under a swirling nebula sky filled with distant stars and planets. Hovering spacecrafts zip through the atmosphere, and a kaleidoscope of colorful, alien creatures can be seen wandering the terrain, adding a sense of adventure to this intergalactic scene.",
+              "negative_prompt": "",
+              "image": "",
+              "width": 540,
+              "height": 960,
+              "guidance_scale": 0,
+              "denoise": 0,
+              "seed": 0,
+              "steps": 0,
+              "batch_size": 0,
+              "scale": 0,
+              "return_preprocessed_image": false,
+              "lora_settings": null,
+              "custom_settings": null
+            },
+            "output": null,
+            "meta": {
+              "created_at": "2025-06-06T04:57:54.923993086Z",
+              "started_at": "0001-01-01T00:00:00Z",
+              "ended_at": "0001-01-01T00:00:00Z",
+              "usage": {
+                "type": "llm",
+                "frozen": 0,
+                "consume": 150000
+              },
+              "is_using_private_pool": false
+            },
+            "detail": null,
+            "logs": [],
+            "error": {
+              "code": 0,
+              "raw_message": "",
+              "message": "",
+              "detail": null
+            }
+          },
+          "message": "success"
+        }
+      }
+    ],
+    "90 seconds": [
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "task_id": "efc866c7-7b7f-4d37-987f-cb69a3e7498c",
+            "model": "Qubico/flux1-dev",
+            "task_type": "txt2img",
+            "status": "pending",
+            "config": {
+              "service_mode": "",
+              "webhook_config": {
+                "endpoint": "",
+                "secret": ""
+              }
+            },
+            "input": {
+              "prompt": "A magnificent Indominus Rex, its scales a shimmering blend of iridescent greens and deep purples, adorned with futuristic, bioluminescent patterns that pulse softly. It boasts sleek, elongated limbs and a long, elegant tail, perfectly suited for swift movement across extraterrestrial landscapes. Draped over its massive frame is a lightweight, metallic exosuit that features glowing circuits and panels, enhancing its ferocity while showcasing a vibrant cosmic theme. A stylish helmet, equipped with an advanced visor displaying interstellar data, completes its look. The background depicts an otherworldly planet, with towering crystal formations and swirling nebulae painted across a star-filled sky. Brightly colored alien flora sprouts from the ground, and in the distance, a dazzling space station orbits a vibrant gas giant. The entire scene vibrates with an electric energy, reinforcing the adventurous spirit of this intergalactic dino crew.",
+              "negative_prompt": "",
+              "image": "",
+              "width": 540,
+              "height": 960,
+              "guidance_scale": 0,
+              "denoise": 0,
+              "seed": 0,
+              "steps": 0,
+              "batch_size": 0,
+              "scale": 0,
+              "return_preprocessed_image": false,
+              "lora_settings": null,
+              "custom_settings": null
+            },
+            "output": null,
+            "meta": {
+              "created_at": "2025-06-06T04:57:54.938196258Z",
+              "started_at": "0001-01-01T00:00:00Z",
+              "ended_at": "0001-01-01T00:00:00Z",
+              "usage": {
+                "type": "llm",
+                "frozen": 0,
+                "consume": 150000
+              },
+              "is_using_private_pool": false
+            },
+            "detail": null,
+            "logs": [],
+            "error": {
+              "code": 0,
+              "raw_message": "",
+              "message": "",
+              "detail": null
+            }
+          },
+          "message": "success"
+        }
+      },
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "task_id": "0fac296e-b376-4ae2-ba64-e519b0aea273",
+            "model": "Qubico/flux1-dev",
+            "task_type": "txt2img",
+            "status": "pending",
+            "config": {
+              "service_mode": "",
+              "webhook_config": {
+                "endpoint": "",
+                "secret": ""
+              }
+            },
+            "input": {
+              "prompt": "A magnificent Spinosaurus with shimmering emerald green scales and a crest of vibrant, iridescent sail feathers stands proudly, outfitted in a sleek metallic space suit adorned with luminous patterns inspired by distant galaxies. Its eyes shimmer with the colors of nebulae, evoking a sense of adventure and bold exploration. The dinosaur's suit features advanced technological enhancements, including a holographic control panel on its left wrist displaying star maps and mission data. The background showcases a surreal alien landscape with swirling purple and blue skies dotted with sparkling stars and massive planets hanging low, while futuristic spacecraft hover nearby, ready for the next expedition. Floating crystal-like rocks and bioluminescent flora dot the terrain, casting an ethereal glow that enhances the intergalactic atmosphere of this thrilling scene.",
+              "negative_prompt": "",
+              "image": "",
+              "width": 540,
+              "height": 960,
+              "guidance_scale": 0,
+              "denoise": 0,
+              "seed": 0,
+              "steps": 0,
+              "batch_size": 0,
+              "scale": 0,
+              "return_preprocessed_image": false,
+              "lora_settings": null,
+              "custom_settings": null
+            },
+            "output": null,
+            "meta": {
+              "created_at": "2025-06-06T04:57:54.937411617Z",
+              "started_at": "0001-01-01T00:00:00Z",
+              "ended_at": "0001-01-01T00:00:00Z",
+              "usage": {
+                "type": "llm",
+                "frozen": 0,
+                "consume": 150000
+              },
+              "is_using_private_pool": false
+            },
+            "detail": null,
+            "logs": [],
+            "error": {
+              "code": 0,
+              "raw_message": "",
+              "message": "",
+              "detail": null
+            }
+          },
+          "message": "success"
+        }
+      },
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "task_id": "4ca9e02c-2017-4392-8bec-b38fd90a0d2a",
+            "model": "Qubico/flux1-dev",
+            "task_type": "txt2img",
+            "status": "pending",
+            "config": {
+              "service_mode": "",
+              "webhook_config": {
+                "endpoint": "",
+                "secret": ""
+              }
+            },
+            "input": {
+              "prompt": "A sleek and agile velociraptor with shimmering emerald scales and striking golden eyes, adorned in a vibrant spacesuit that features a kaleidoscope of cosmic patterns, complete with a sleek helmet designed for interstellar travel. The suit boasts silver accents and glowing circuitry that pulse with energy. Equipped with futuristic gauntlets that enhance agility and a utility belt filled with advanced gadgets, the velociraptor stands poised on the deck of a starship, surrounded by a panoramic view of distant galaxies and swirling nebulae. Twinkling stars and colorful cosmic dust fill the backdrop, while intergalactic crew members in matching outfits bustle around, working on various alien technologies, creating a lively and adventurous atmosphere in this otherworldly scene.",
+              "negative_prompt": "",
+              "image": "",
+              "width": 540,
+              "height": 960,
+              "guidance_scale": 0,
+              "denoise": 0,
+              "seed": 0,
+              "steps": 0,
+              "batch_size": 0,
+              "scale": 0,
+              "return_preprocessed_image": false,
+              "lora_settings": null,
+              "custom_settings": null
+            },
+            "output": null,
+            "meta": {
+              "created_at": "2025-06-06T04:57:54.93981764Z",
+              "started_at": "0001-01-01T00:00:00Z",
+              "ended_at": "0001-01-01T00:00:00Z",
+              "usage": {
+                "type": "llm",
+                "frozen": 0,
+                "consume": 150000
+              },
+              "is_using_private_pool": false
+            },
+            "detail": null,
+            "logs": [],
+            "error": {
+              "code": 0,
+              "raw_message": "",
+              "message": "",
+              "detail": null
+            }
+          },
+          "message": "success"
+        }
+      },
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "task_id": "93a98ecf-c5df-4808-ba7d-39ea932d71e2",
+            "model": "Qubico/flux1-dev",
+            "task_type": "txt2img",
+            "status": "pending",
+            "config": {
+              "service_mode": "",
+              "webhook_config": {
+                "endpoint": "",
+                "secret": ""
+              }
+            },
+            "input": {
+              "prompt": "A majestic triceratops with shimmering scales that reflect a spectrum of colors, its large frills adorned with bioluminescent patterns that pulsate in rhythm with its surroundings. Dressed in a sleek metallic exosuit colored in deep space blue and silver, the triceratops showcases a series of glowing tech gadgets along its back and sides, including a holographic communicator that projects star maps. A futuristic helmet, intricately designed with star motifs, fits snugly atop its head, complete with visor that displays vital space statistics. The background reveals a vibrant alien planet dotted with luminescent flora and peculiar rock formations under a swirling nebula sky filled with distant stars and planets. Hovering spacecrafts zip through the atmosphere, and a kaleidoscope of colorful, alien creatures can be seen wandering the terrain, adding a sense of adventure to this intergalactic scene.",
+              "negative_prompt": "",
+              "image": "",
+              "width": 540,
+              "height": 960,
+              "guidance_scale": 0,
+              "denoise": 0,
+              "seed": 0,
+              "steps": 0,
+              "batch_size": 0,
+              "scale": 0,
+              "return_preprocessed_image": false,
+              "lora_settings": null,
+              "custom_settings": null
+            },
+            "output": null,
+            "meta": {
+              "created_at": "2025-06-06T04:57:54.923993086Z",
+              "started_at": "0001-01-01T00:00:00Z",
+              "ended_at": "0001-01-01T00:00:00Z",
+              "usage": {
+                "type": "llm",
+                "frozen": 0,
+                "consume": 150000
+              },
+              "is_using_private_pool": false
+            },
+            "detail": null,
+            "logs": [],
+            "error": {
+              "code": 0,
+              "raw_message": "",
+              "message": "",
+              "detail": null
+            }
+          },
+          "message": "success"
+        }
+      }
+    ],
+    "Generate Videos (Fal.ai)": [
+      {
+        "json": {
+          "video": {
+            "url": "https://v3.fal.media/files/rabbit/QHkPX7FpQ9Md_6O7KeRC0_output.mp4",
+            "content_type": "video/mp4",
+            "file_name": "output.mp4",
+            "file_size": 6224188
+          }
+        }
+      },
+      {
+        "json": {
+          "video": {
+            "url": "https://v3.fal.media/files/tiger/jUlVqXPZO7bn2Kai-ke5P_output.mp4",
+            "content_type": "video/mp4",
+            "file_name": "output.mp4",
+            "file_size": 6919057
+          }
+        }
+      },
+      {
+        "json": {
+          "video": {
+            "url": "https://v3.fal.media/files/tiger/0SOcJNTVO9_no6xOW3vnn_output.mp4",
+            "content_type": "video/mp4",
+            "file_name": "output.mp4",
+            "file_size": 5509924
+          }
+        }
+      },
+      {
+        "json": {
+          "video": {
+            "url": "https://v3.fal.media/files/monkey/2pUUbBtTac7F542FmXrTp_output.mp4",
+            "content_type": "video/mp4",
+            "file_name": "output.mp4",
+            "file_size": 8094497
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Grab Idea": {
+      "main": [
+        [
+          {
+            "node": "Set Animals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Animals": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Image Prompt Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Prompt Agent": {
+      "main": [
+        [
+          {
+            "node": "Remove \\n",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove \\n": {
+      "main": [
+        [
+          {
+            "node": "Set Prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Prompts": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image": {
+      "main": [
+        [
+          {
+            "node": "90 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "90 seconds": {
+      "main": [
+        [
+          {
+            "node": "Get Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Images": {
+      "main": [
+        [
+          {
+            "node": "Generate Videos (Fal.ai)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render Video": {
+      "main": [
+        [
+          {
+            "node": "25 Seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "25 Seconds": {
+      "main": [
+        [
+          {
+            "node": "Download Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Video": {
+      "main": [
+        [
+          {
+            "node": "Upload Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Video": {
+      "main": [
+        [
+          {
+            "node": "Update Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Sheet": {
+      "main": [
+        [
+          {
+            "node": "Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Videos (Kling)": {
+      "main": [
+        [
+          {
+            "node": "8 Minutes1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "8 Minutes1": {
+      "main": [
+        [
+          {
+            "node": "Get Videos (Kling)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Videos (Kling)": {
+      "main": [
+        []
+      ]
+    },
+    "Split Out Parts (Kling)1": {
+      "main": [
+        [
+          {
+            "node": "Render Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Image Prompt Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Videos (Fal.ai)": {
+      "main": [
+        [
+          {
+            "node": "Split Out Parts (Kling)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notification": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Grab Idea",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "82204c3b-4e4e-4ca8-ac97-e7ad6ce955b1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ab25ba907ec9fa43787046c159b4eb21d4a6a913f12044328d00034fe200bb3b"
+  },
+  "id": "iaIyoaX0ObwhD8HG",
+  "tags": []
+}
