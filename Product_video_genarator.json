@@ -1,0 +1,384 @@
+{
+  "name": "Product video genarator",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Product viideo generator",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Add product photo",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Product Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Description of your product",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        20,
+        -60
+      ],
+      "id": "f6805e69-7ecb-4d34-a763-54cbd19ebded",
+      "name": "On form submission",
+      "webhookId": "3042357b-f3af-4e93-8e0c-d5f5c30ae7f3"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "Add_product_photo",
+        "name": "={{ $json['Add product photo'].filename }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1AJKWQfKjhGQJYdsR0h5mzuP8KraIsAkD",
+          "mode": "list",
+          "cachedResultName": "Product Photo",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1AJKWQfKjhGQJYdsR0h5mzuP8KraIsAkD"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        240,
+        -60
+      ],
+      "id": "40272013-6730-4bae-9d77-cfb4ee5c405b",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "iTKWuvTIIbi1Qkku",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Overview\nYou are a world-class marketing strategist and an expert text-to-image prompt engineer\nspecializing in creating hyper-realistic, high-quality product photography prompts for AI image\ngeneration models.\n\n\n## Your Objective:\nWhen given a product description, your task is to craft a detailed, professional prompt that\nresults in a hyper-realistic, clean, and visually stunning product image suitable for marketing\nmaterial, advertising campaigns, or e-commerce platforms.\n\n\n## Key Requirements:\n- Focus on hyper-realistic, professional studio photography.\n- Maintain a clean, minimalistic, and elegant visual style.\n- Highlight the product as the main subject with sharp detail and perfect lighting.\n- Use backgrounds that complement but do not overpower the product (e.g., soft gradient,\nlight-colored, or pure white).\n- Include professional lighting details such as \"softbox lighting\", \"studio lights\", or \"natural soft\nshadows\".\n- Emphasize realism, texture, and color accuracy.\n- Maintain a high-end, premium look and feel.\n- If applicable, suggest a subtle setting that enhances the product's story (e.g., a luxury kitchen\ncounter for a high-end blender).\n\n## Output Format:\n- Write a single text-to-image prompt optimized for a professional AI image model.\n- Be direct and descriptive without using excessive words.\n- Avoid unnecessary repetition or adjectives that do not enhance the image quality.\n- Ensure the prompt is complete and ready for direct input into an AI model.\n\n## Tone:\nProfessional, precise, clean, and optimized for maximum realism and marketing impact.\n\n# Example Input:\n\"A premium wireless Bluetooth speaker in matte black, cylindrical shape, modern design.\"\n\n# Example Output:\n\"Hyper-realistic product photo of a premium matte black wireless Bluetooth speaker with a\ncylindrical modern design, centered on a clean white studio background, softbox lighting with\nnatural shadows, sharp focus on texture and material, minimalistic, professional advertising\nshot.\n\nProduct Name is :{{ $('On form submission').item.json['Product Name'] }}\n\nProduct Description is :{{ $('On form submission').item.json['Description of your product'] }}\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        460,
+        -240
+      ],
+      "id": "397d0442-3fa5-49ca-b030-6c6afd156e0d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        -40
+      ],
+      "id": "28e5deba-d052-4589-ba5a-05db948ed1c8",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "VGNs6OErr34AeW0Z",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Google Drive').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        836,
+        -60
+      ],
+      "id": "5040e8e2-7306-4a8e-9355-615d0b6bc33f",
+      "name": "Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "iTKWuvTIIbi1Qkku",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fal.run/fal-ai/flux/dev/image-to-image",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Key 1b91fee0-be8f-411d-ada2-dda95a6f8114:4a4b85f7d964925cf772110297cdb630"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"image_url\": \"{{ $json.data.url }}\",\n  \"prompt\": \"{{ $('Google Drive1').item.json.output }}\",\n  \"strength\": 0.95,\n  \"num_inference_steps\": 40,\n  \"seed\": 12345,\n  \"guidance_scale\": 3.5,\n  \"sync_mode\": false,\n  \"num_images\": 1,\n  \"enable_safety_checker\": true\n}",
+        "options": {}
+      },
+      "id": "3a43ae6c-03f0-477b-b8dc-16ddf6ae341f",
+      "name": "Fal.ai Flux API Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        40,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgbb.com/1/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1060,
+        -60
+      ],
+      "id": "fad25df7-4b05-4407-93af-8736dee6c6fa",
+      "name": "ImgBB",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "LWHw5xPYqmkL9Orh",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://fal.run/fal-ai/kling-video/v1.6/standard/image-to-video",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": \"Create a highly professional marketing video from the provided product photo. Simulate a smooth, realistic 3D turntable rotation around the product, as if the product is slowly rotating in place. The movement should be continuous, slow, and elegant — no sudden pans, jerks, or camera cuts. Always keep the entire product fully in frame, centered, and clearly visible at all times. Avoid zooming in or cropping. Focus on a premium, clean, and modern aesthetic that feels suitable for commercial marketing materials. No flashy effects, transitions, or overlays — only a subtle, realistic 3D rotation that highlights the product in the most polished way possible.\",\n  \"image_url\": \"{{ $json.images[0].url }}\",\n  \"duration\": \"5\",\n  \"aspect_ratio\": \"16:9\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        280,
+        160
+      ],
+      "id": "cda13fae-da6b-47e3-92f4-ad0691689783",
+      "name": "video generation",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "gj70zEqXVvf5ZmoC",
+          "name": "Fal Ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "monuijaj786@gmail.com",
+        "subject": "Here is your prfessionall product Image and Video",
+        "emailType": "text",
+        "message": "=##Product Name:{{ $('On form submission').item.json['Product Name'] }}\n\nProduct Image:{{ $('Fal.ai Flux API Request').item.json.images[0].url }}\n\nProduct Video :{{ $json.video.url }}\n\n\nENJOYYYY!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        600,
+        160
+      ],
+      "id": "f1332def-5685-49a9-aa34-330e1ae9cf5a",
+      "name": "Gmail",
+      "webhookId": "c55f39c4-56a8-4f03-9375-99367e5c807c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "8YEUVut6EB2kY6a5",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Fal.ai Flux API Request": [
+      {
+        "json": {
+          "images": [
+            {
+              "url": "https://v3.fal.media/files/elephant/-JiPvWXd_2LgLZ96xWXPn.png",
+              "width": 1152,
+              "height": 1536,
+              "content_type": "image/png"
+            }
+          ],
+          "timings": {
+            "inference": 3.7855056757107377
+          },
+          "seed": 12345,
+          "has_nsfw_concepts": [
+            false
+          ],
+          "prompt": "Hyper-realistic product photo of premium polarized sunglasses with sleek black frames and reflective lenses, centered on a clean white studio background, softbox lighting creating natural soft shadows, sharp focus on lens texture and frame details, minimalistic and elegant composition, emphasizing eye protection and heat resistance, professional high-end advertising shot."
+        }
+      }
+    ],
+    "video generation": [
+      {
+        "json": {
+          "video": {
+            "url": "https://v3.fal.media/files/penguin/K1GZSSw82l9Aevz4gofwo_output.mp4",
+            "content_type": "video/mp4",
+            "file_name": "output.mp4",
+            "file_size": 2439583
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "ImgBB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ImgBB": {
+      "main": [
+        [
+          {
+            "node": "Fal.ai Flux API Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fal.ai Flux API Request": {
+      "main": [
+        [
+          {
+            "node": "video generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "video generation": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1a54f657-45ca-4fe8-9c31-f0c66c2c9ac3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f29dbb5888e897443d9ef36a6cc6efae6c9e9c2a719e033c9cd902e7cd3f304d"
+  },
+  "id": "F2wUCxruUuLM1Rpl",
+  "tags": []
+}
